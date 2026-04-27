@@ -41,18 +41,23 @@ class CalculatorServiceImpl extends ChangeNotifier
   }
 
   @override
-  void deleteLast() {
+  void deleteLast({int? cursorIndex}) {
     _hardwareService.vibrateClick();
+    if (_expression.isEmpty) return;
 
-    if (_isFinalized) {
-      clearAll();
-      return;
-    }
+    int target =
+        (cursorIndex != null &&
+            cursorIndex > 0 &&
+            cursorIndex <= _expression.length)
+        ? cursorIndex
+        : _expression.length;
 
-    if (_expression.isNotEmpty) {
-      _expression = _expression.substring(0, _expression.length - 1);
-      notifyListeners();
-    }
+    if (target == 0) return;
+
+    _expression =
+        _expression.substring(0, target - 1) + _expression.substring(target);
+
+    notifyListeners();
   }
 
   @override
@@ -76,22 +81,28 @@ class CalculatorServiceImpl extends ChangeNotifier
   }
 
   @override
-  void handleInput(String key) {
+  void handleInput(String key, {int? cursorIndex}) {
     _hardwareService.vibrateClick();
-
     if (_isFinalized) {
-      if (_isOperator(key) && _currentResult != "Error") {
-        _expression = _currentResult + key;
+      if (['+', '-', '×', '÷'].contains(key)) {
+        _expression = _currentResult;
       } else {
-        _expression = key;
+        _expression = "";
       }
       _currentResult = "";
       _isFinalized = false;
-      notifyListeners();
-      return;
     }
 
-    _expression += key;
+    int target =
+        (cursorIndex != null &&
+            cursorIndex >= 0 &&
+            cursorIndex <= _expression.length)
+        ? cursorIndex
+        : _expression.length;
+
+    _expression =
+        _expression.substring(0, target) + key + _expression.substring(target);
+
     notifyListeners();
   }
 
@@ -121,12 +132,23 @@ class CalculatorServiceImpl extends ChangeNotifier
     notifyListeners();
   }
 
-  bool _isOperator(String key) {
-    return key == '+' ||
-        key == '-' ||
-        key == '*' ||
-        key == '/' ||
-        key == '×' ||
-        key == '÷';
+  @override
+  void loadHistory(String expression, String result) {
+    _hardwareService.vibrateClick();
+    _expression = expression;
+    _currentResult = result;
+
+    _isFinalized = true;
+    notifyListeners();
+  }
+
+  @override
+  void returnToEditMode() {
+    if (_isFinalized) {
+      _hardwareService.vibrateClick();
+      _currentResult = "";
+      _isFinalized = false;
+      notifyListeners();
+    }
   }
 }

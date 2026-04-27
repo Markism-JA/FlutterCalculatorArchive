@@ -5,13 +5,17 @@ abstract interface class CalculatorService {
 
   bool get isFinalized;
 
-  void handleInput(String key);
+  void handleInput(String key, {int? cursorIndex});
 
   void compute();
 
   void clearAll();
 
-  void deleteLast();
+  void deleteLast({int? cursorIndex});
 
   void toggleSign();
+
+  void loadHistory(String expression, String result);
+
+  void returnToEditMode();
 }

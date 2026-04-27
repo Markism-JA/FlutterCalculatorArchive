@@ -3,6 +3,8 @@ import 'package:advmobprog_prefinals_tp01_amarille/model/history_entry.dart';
 abstract interface class HistoryService {
   Stream<List<HistoryEntry>> get historyStream;
 
+  List<HistoryEntry> get history;
+
   Future<void> save(String expression, String result);
 
   Future<void> delete(String id);
