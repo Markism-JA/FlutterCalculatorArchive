@@ -9,13 +9,14 @@ import 'package:advmobprog_prefinals_tp01_amarille/widgets/calculator_display.da
 import 'package:advmobprog_prefinals_tp01_amarille/widgets/calculator_keyboard.dart';
 import 'package:advmobprog_prefinals_tp01_amarille/widgets/theme_switcher.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:logger/logger.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
+  var logger = Logger();
   WidgetsFlutterBinding.ensureInitialized();
 
   configureDependencies();
@@ -39,7 +40,7 @@ void main() async {
       });
     }
   } catch (e) {
-    // Ignore if running on Web or Mobile
+    logger.e("Error initializing window manager: $e");
   }
 
   runApp(
@@ -70,50 +71,62 @@ class _CalculatorAppState extends State<CalculatorApp> {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(
-      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        ColorScheme lightScheme =
-            lightDynamic ??
-            ColorScheme.fromSeed(
-              seedColor: _defaultCustomColor,
-              brightness: Brightness.light,
-            );
+    final lightScheme = ColorScheme.fromSeed(
+      seedColor: _defaultCustomColor,
+      brightness: Brightness.light,
+    );
 
-        ColorScheme darkScheme =
-            darkDynamic ??
-            ColorScheme.fromSeed(
-              seedColor: _defaultCustomColor,
-              brightness: Brightness.dark,
-            );
+    final darkScheme = ColorScheme.fromSeed(
+      seedColor: _defaultCustomColor,
+      brightness: Brightness.dark,
+    );
 
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          themeMode: _themeMode,
-          locale: DevicePreview.locale(context),
-          builder: DevicePreview.appBuilder,
+    final isDark =
+        _themeMode == ThemeMode.dark ||
+        (_themeMode == ThemeMode.system &&
+            MediaQuery.of(context).platformBrightness == Brightness.dark);
 
-          theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: lightScheme,
-            textTheme: GoogleFonts.interTextTheme(),
-            scaffoldBackgroundColor: lightScheme.surface,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      ),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        themeMode: _themeMode,
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,
+
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: lightScheme,
+          textTheme: GoogleFonts.interTextTheme(),
+          scaffoldBackgroundColor: lightScheme.surface,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
+        ),
 
-          darkTheme: ThemeData(
-            useMaterial3: true,
-            colorScheme: darkScheme,
-            textTheme: GoogleFonts.interTextTheme(
-              ThemeData(brightness: Brightness.dark).textTheme,
-            ),
-            scaffoldBackgroundColor: darkScheme.surface,
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          colorScheme: darkScheme,
+          textTheme: GoogleFonts.interTextTheme(
+            ThemeData(brightness: Brightness.dark).textTheme,
           ),
+          scaffoldBackgroundColor: darkScheme.surface,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
+        ),
 
-          home: CalculatorMainScreen(
-            onThemeToggle: setDarkMode,
-            currentThemeMode: _themeMode,
-          ),
-        );
-      },
+        home: CalculatorMainScreen(
+          onThemeToggle: setDarkMode,
+          currentThemeMode: _themeMode,
+        ),
+      ),
     );
   }
 }
@@ -356,7 +369,7 @@ class _CalculatorMainScreenState extends State<CalculatorMainScreen> {
       },
       behavior: HitTestBehavior.opaque,
       child: Focus(
-        focusNode: _keyboardFocusNode, // The outer trap
+        focusNode: _keyboardFocusNode,
         autofocus: true,
         onKeyEvent: _handleKeyEvent,
         child: LayoutBuilder(
@@ -431,8 +444,7 @@ class _CalculatorMainScreenState extends State<CalculatorMainScreen> {
                     expression: _calculatorService.expression,
                     result: _calculatorService.currentResult,
                     cursorNotifier: _cursorNotifier,
-                    textFieldFocusNode:
-                        _textFieldFocusNode, // Pass the inner node!
+                    textFieldFocusNode: _textFieldFocusNode,
                     onTapToEdit: () {
                       _calculatorService.returnToEditMode();
                       _textFieldFocusNode.requestFocus();

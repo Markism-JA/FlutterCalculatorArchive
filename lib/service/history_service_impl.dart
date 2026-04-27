@@ -107,7 +107,7 @@ class HistoryServiceImpl implements HistoryService {
         _controller.add(List.unmodifiable(_historyList));
       }
     } catch (e) {
-      logger.e("Failed to save history to disk: $e");
+      logger.e("Failed to load history from disk: $e");
     }
   }
 }

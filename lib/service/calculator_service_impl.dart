@@ -37,7 +37,7 @@ class CalculatorServiceImpl extends ChangeNotifier
     _currentResult = "";
     _isFinalized = false;
     _hardwareService.vibrateClick();
-    notifyListeners(); // Tell UI to update
+    notifyListeners();
   }
 
   @override
