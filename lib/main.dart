@@ -31,7 +31,7 @@ class _CalculatorAppState extends State<CalculatorApp> {
     });
   }
 
-  static const _defaultCustomColor = Color(0xFF64412c);
+  static const _defaultCustomColor = Color(0xFF2F3542);
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +175,6 @@ class _CalculatorMainScreenState extends State<CalculatorMainScreen> {
               const SizedBox(height: 24),
               Column(
                 children: [
-                  // 4. Pass the state variables into your UI
                   _buildResultRow("Addition", _additionResult),
                   _buildResultRow("Subtraction", _subtractionResult),
                   _buildResultRow("Multiplication", _multiplicationResult),
