@@ -34,8 +34,6 @@ class CalculatorButton extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: Center(
-              // We wrap the child in an IconTheme/DefaultTextStyle
-              // so colors apply to both icons and text automatically.
               child: IconTheme(
                 data: IconThemeData(color: effectiveTextColor, size: 28),
                 child: DefaultTextStyle(

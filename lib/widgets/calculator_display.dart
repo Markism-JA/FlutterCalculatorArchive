@@ -75,7 +75,6 @@ class _CalculatorDisplayState extends State<CalculatorDisplay> {
 
       newOffset = math.max(0, math.min(newOffset, newText.length));
 
-      // Update text and cursor atomically
       _controller.value = TextEditingValue(
         text: newText,
         selection: TextSelection.collapsed(offset: newOffset),
